@@ -21,9 +21,16 @@ const userSchema = new mongoose.Schema({
 
 const User = new mongoose.model("User",userSchema)
 
+const detailSchema = new mongoose.Schema({
+    firstname: String,
+    lastname : String,
+    phone : Number ,
+    address : String ,
+    room : Number
+})
 
 
-
+const Detail = new mongoose.model("Detail",detailSchema)
 
 app.post('/signup',(req,res)=>{
     // res.send("SIGNUP")
@@ -51,7 +58,6 @@ app.post('/signup',(req,res)=>{
 
 app.post('/login',(req,res)=>{
     //res.send("LOGIN")
-
     const { email,password} = req.body
    User.findOne({email:email},(err,user)=>{
        if(user){
@@ -66,9 +72,34 @@ app.post('/login',(req,res)=>{
    })
 })
 
-app.get('/details',(req,res)=>{
-    res.send("Details")
+app.post('/details',(req,res)=>{
+    // res.send("Details")
+    const { firstname , lastname , phone , address , room} = req.body
+    Detail.create(req.body,err =>{
+        if(err){
+            res.send(err)
+        }else{
+            res.send({message:"Detail save"})
+        }
+    })
 })
+
+
+app.get('/detailslist',(req,res)=>{
+    // const { firstname , lastname , phone , address , room} = req.body
+    // console.log(req.body.firstname)
+    // res.send("Detail List")
+    Detail.find({},(err,list)=>{
+        console.log(list,"list")
+        console.log(err,"err")
+        if(err){
+            res.send("No data")
+        }else{
+            res.send({list})
+        }
+    })
+})
+
 
 
 app.listen(9000,()=>{
