@@ -1,6 +1,7 @@
 import express from "express"
 import cors from "cors"
 import mongoose from "mongoose"
+import bcrypt from 'bcrypt';
 
 
 const app = express()
@@ -18,6 +19,29 @@ const userSchema = new mongoose.Schema({
     email:String,
     password:String,
 })
+
+userSchema.pre('save',function(next){
+    console.log(this,'This in the pre')
+    if(this.password && this.isModified ('password')){
+        bcrypt.hash(this.password,10,(err,hashed)=>{
+            if(err) return next(err)
+            this.password = hashed;
+            return next()
+        })
+    }else{
+        next()
+    }
+})
+
+
+userSchema.methods.verifypassword=function(password,cb){
+    bcrypt.compare(password,this.password ,(err,result)=>{
+        console.log(result)
+        return cb(err,result)
+    })
+}
+
+
 
 const User = new mongoose.model("User",userSchema)
 
